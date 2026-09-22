@@ -223,7 +223,7 @@
     .admin-btn.danger { background: #e11d48; }
     .admin-btn.success { background: #059669; }
 
-    /* GEMINI AI SOHBET PENCERESİ */
+    /* ⭐ GEMINI AI SOHBET PENCERESİ ⭐ */
     #ai-chat-modal {
       position: fixed;
       top: 0;
@@ -484,7 +484,7 @@
     </div>
   </div>
 
-  <!-- GEMINI AI SOHBET PENCERESİ -->
+  <!-- ⭐ GEMINI AI SOHBET PENCERESİ ⭐ -->
   <div id="ai-chat-modal">
     <div class="chat-box">
       <div class="chat-header">
@@ -663,16 +663,14 @@
       stage4Tasks: { lunchbox: false, painting: false, chat: false, bag: false }
     };
 
-    let gameState = JSON.parse(localStorage.getItem('kizimiz_save_v11')) || defaultState;
+    let gameState = JSON.parse(localStorage.getItem('kizimiz_save_v12')) || defaultState;
 
-    // ⭐ URL ÜZERİNDEN OTOMATİK API ANAHTARI YAKALAMA SİSTEMİ ⭐
-    // Örnek kullanım: site.com/?key=AIzaSy...
+    // URL parametresinden API key alma (?key=AIzaSy...)
     const urlParams = new URLSearchParams(window.location.search);
     const incomingKey = urlParams.get('key');
     if (incomingKey && incomingKey.trim() !== "") {
       gameState.geminiApiKey = incomingKey.trim();
-      localStorage.setItem('kizimiz_save_v11', JSON.stringify(gameState));
-      // Adres çubuğundaki anahtarı temizle (gizle)
+      localStorage.setItem('kizimiz_save_v12', JSON.stringify(gameState));
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
@@ -785,7 +783,7 @@
     }
 
     function kaydet() {
-      localStorage.setItem('kizimiz_save_v11', JSON.stringify(gameState));
+      localStorage.setItem('kizimiz_save_v12', JSON.stringify(gameState));
       uiGuncelle();
     }
 
@@ -817,7 +815,7 @@
       else diyalogGoster("İyi ki benim annemsin! 💖");
     }
 
-    // --- GEMINI AI SOHBET MOTORU ---
+    // --- GERÇEK GEMINI AI SOHBET MOTORU (TAM ENTEGRE) ---
     function sohbetAc() {
       if (!gameState.stage4Tasks.painting) {
         diyalogGoster("Önce okulda çizdiğim resmi inceleyelim annecim! 🎨");
@@ -842,65 +840,48 @@
 
       const apiKey = gameState.geminiApiKey;
 
-      if (apiKey && apiKey.trim() !== "") {
-        try {
-          const systemPrompt = `Sen Sümeyye (annen) ve Alperen'in (baban) 5-6 yaşındaki çok tatlı, neşeli kızısın. Adın ${gameState.name || 'Kızın'}. Anasınıfına gidiyorsun. Fenerbahçelisin. Cümlelerin çocuksu, neşeli, kısa ve masum olsun (en fazla 2 cümle). Okuldaki arkadaşlarınla oyunlardan, boyamalardan ve anne-baba sevgisinden bahset. Soruya çocuksu ve doğal cevap ver. Asla bir yapay zeka olduğunu söyleme.`;
-          
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-          
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{ text: `${systemPrompt}\n\nAnnen sana şunu sordu: "${soru}"` }]
-              }]
-            })
-          });
-
-          const data = await res.json();
-          
-          if (data.candidates && data.candidates[0].content.parts[0].text) {
-            const cevap = data.candidates[0].content.parts[0].text.trim();
-            responseEl.innerText = cevap;
-            diyalogGoster(cevap.substring(0, 40) + "...");
-            tamamlaChatGorevi();
-            return;
-          }
-        } catch (e) {
-          console.error("Gemini API Bağlantı Hatası:", e);
-        }
+      if (!apiKey || apiKey.trim() === "") {
+        responseEl.innerText = "Annecim API anahtarı girilmemiş! Sağ üstteki Gün butonuna 3 kez tıkla ve anahtarı kaydet. 🔑";
+        return;
       }
 
-      // Emniyet Sibobu (Akıllı Yedek Motor)
-      setTimeout(() => {
-        const s = soru.toLowerCase();
-        let cevap = "Çok iyiyim annecim, seninle sohbet etmek harika! 🌸";
+      try {
+        const systemPrompt = `Sen Sümeyye (annen) ve Alperen'in (baban) 5-6 yaşındaki çok tatlı, neşeli kızısın. Adın ${gameState.name || 'Kızın'}. Anasınıfına gidiyorsun. Fenerbahçelisin. Cümlelerin çocuksu, neşeli, kısa ve masum olsun (en fazla 2-3 cümle). Okuldaki arkadaşlarınla oyunlardan, boyamalardan ve anne-baba sevgisinden bahset. Annenin sorusuna doğrudan ve çocuksu cevap ver. Asla bir yapay zeka olduğunu belli etme.`;
         
-        if (s.includes('nasılsın') || s.includes('naber')) {
-          cevap = "Çok mutluyum annecim, bugün okulda çok eğlendim! Sen nasılsın? 🥰";
-        } else if (s.includes('baba') || s.includes('alperen')) {
-          cevap = "Babamla maç özeti izleyeceğiz değil mi? En büyük Fener! 💛💙";
-        } else if (s.includes('seviyor')) {
-          cevap = "Dünyalar kadar, gökyüzündeki yıldızlar kadar çok seviyorum annecim! 💖";
-        } else if (s.includes('yemek') || s.includes('beslenme')) {
-          cevap = "Çantama koyduğun sandviçi bitirdim, ellerine sağlık! 🥪😋";
-        } else if (s.includes('resim') || s.includes('okul')) {
-          cevap = "Öğretmenim yaptığım sarı-lacivert kelebeğe yıldız verdi! 🎨✨";
-        } else if (s.includes('fenerbahçe') || s.includes('fener') || s.includes('maç')) {
-          cevap = "En büyük Fenerbahçe! Şampiyon olacağız bu sene! 💛💙🎉";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: `${systemPrompt}\n\nAnnem bana şunu söyledi: "${soru}". Ona çocuksu cevabım:` }]
+              }
+            ]
+          })
+        });
+
+        const data = await res.json();
+        
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+          const cevap = data.candidates[0].content.parts[0].text.trim();
+          responseEl.innerText = cevap;
+          diyalogGoster(cevap.substring(0, 45) + "...");
+          
+          if (!gameState.stage4Tasks.chat) {
+            gameState.stage4Tasks.chat = true;
+            kaydet();
+          }
+        } else if (data.error) {
+          responseEl.innerText = "Hata oluştu annecim: " + (data.error.message || "API Hatası");
+        } else {
+          responseEl.innerText = "Seni duyamadım annecim, bir daha söyler misin? 🌸";
         }
-
-        responseEl.innerText = cevap;
-        diyalogGoster(cevap);
-        tamamlaChatGorevi();
-      }, 700);
-    }
-
-    function tamamlaChatGorevi() {
-      if (!gameState.stage4Tasks.chat) {
-        gameState.stage4Tasks.chat = true;
-        kaydet();
+      } catch (err) {
+        console.error("API Fetch Hatası:", err);
+        responseEl.innerText = "İnternet bağlantımda bir sorun oldu annecim... Tekrar dener misin? 📶";
       }
     }
 
@@ -927,7 +908,7 @@
       const key = document.getElementById('admin-api-key').value.trim();
       gameState.geminiApiKey = key;
       kaydet();
-      alert("Gemini API Anahtarı başarıyla güncellendi! 🔑✨");
+      alert("Gemini API Anahtarı başarıyla kaydedildi! 🔑✨");
     }
 
     function adminGuneGit() {
@@ -971,7 +952,7 @@
 
     function adminSifirla() {
       if (confirm("Oyun sıfırlansın mı?")) {
-        localStorage.removeItem('kizimiz_save_v11');
+        localStorage.removeItem('kizimiz_save_v12');
         location.reload();
       }
     }
