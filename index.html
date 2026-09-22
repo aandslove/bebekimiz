@@ -223,8 +223,8 @@
     .admin-btn.danger { background: #e11d48; }
     .admin-btn.success { background: #059669; }
 
-    /* ⭐ GEMINI AI SOHBET PENCERESİ ⭐ */
-    #ai-chat-modal {
+    /* TOKA SEÇİM MODALI */
+    #bow-modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -234,61 +234,40 @@
       backdrop-filter: blur(8px);
       display: none;
       justify-content: center;
-      align-items: flex-end;
+      align-items: center;
       z-index: 250;
-      padding: 15px;
-    }
-    .chat-box {
-      background: white;
-      width: 100%;
-      max-width: 380px;
-      border-radius: 28px 28px 20px 20px;
       padding: 20px;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+    }
+    .bow-card {
+      background: white;
+      border-radius: 26px;
+      padding: 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    }
+    .bow-card h3 { color: #2d3436; font-size: 17px; margin-bottom: 8px; }
+    .bow-card p { font-size: 13px; color: #636e72; margin-bottom: 18px; }
+    .bow-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .bow-btn {
+      padding: 14px 8px;
+      border-radius: 16px;
+      border: 2px solid #edf2f7;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-    }
-    .chat-header {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-weight: 800;
-      color: #2d3436;
-      font-size: 15px;
+      gap: 6px;
+      transition: transform 0.15s;
     }
-    .chat-response {
-      background: #f8f9fa;
-      border-radius: 16px;
-      padding: 14px;
-      font-size: 14px;
-      color: #2d3436;
-      min-height: 60px;
-      line-height: 1.4;
-      border: 1px solid #edf2f7;
-    }
-    .chat-input-row {
-      display: flex;
-      gap: 8px;
-    }
-    .chat-input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 14px;
-      border: 1.5px solid #fedfe1;
-      font-size: 14px;
-      outline: none;
-      color: #2d3436;
-    }
-    .chat-send-btn {
-      background: #e84393;
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .bow-btn:active { transform: scale(0.95); }
 
     /* HUD */
     #hud {
@@ -484,19 +463,21 @@
     </div>
   </div>
 
-  <!-- ⭐ GEMINI AI SOHBET PENCERESİ ⭐ -->
-  <div id="ai-chat-modal">
-    <div class="chat-box">
-      <div class="chat-header">
-        <span id="chat-title">💬 Kızımızla Sohbet</span>
-        <button onclick="sohbetKapat()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
-      </div>
-      <div class="chat-response" id="chat-response-text">
-        Annecim bugün okulda neler yaptık biliyor musun? Bana bir şey sor! 🌸
-      </div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-user-input" class="chat-input" placeholder="Kızına bir şey sor..." onkeydown="if(event.key==='Enter') aiSoruSor()">
-        <button class="chat-send-btn" onclick="aiSoruSor()">Sor 💌</button>
+  <!-- Toka / Kıyafet Rengi Seçim Modalı -->
+  <div id="bow-modal">
+    <div class="bow-card">
+      <h3>🎀 Toka & Kıyafet Seçimi</h3>
+      <p>Yarın okula giderken hangi rengi taksın annecim?</p>
+      <div class="bow-options">
+        <button class="bow-btn" style="background:#fff9db; color:#e67e22;" onclick="renkSec('sari')">
+          <span style="font-size:22px;">💛</span> Sarı Toka
+        </button>
+        <button class="bow-btn" style="background:#edf2ff; color:#1e3799;" onclick="renkSec('lacivert')">
+          <span style="font-size:22px;">💙</span> FB Lacivert
+        </button>
+        <button class="bow-btn" style="background:#fff0f6; color:#d6336c;" onclick="renkSec('pembe')">
+          <span style="font-size:22px;">💖</span> Pembe
+        </button>
       </div>
     </div>
   </div>
@@ -524,14 +505,6 @@
           <button class="admin-btn" style="flex:1;" onclick="adminAsamaDegis(2)">2. Emekleme</button>
           <button class="admin-btn" style="flex:1;" onclick="adminAsamaDegis(3)">3. Çocuk</button>
           <button class="admin-btn" style="flex:1; background:#8e44ad;" onclick="adminAsamaDegis(4)">4. Okul</button>
-        </div>
-      </div>
-
-      <div class="admin-group">
-        <label>🔑 GEMINI API ANAHTARI:</label>
-        <div class="admin-row">
-          <input type="password" id="admin-api-key" class="admin-input" placeholder="AI Studio Key..." style="text-align:left;">
-          <button class="admin-btn" onclick="adminApiKeyKaydet()">Kaydet</button>
         </div>
       </div>
 
@@ -630,6 +603,18 @@
           gain.connect(audioCtx.destination);
           osc.start(t);
           osc.stop(t + 0.22);
+        } else if (type === 'dance') {
+          [523, 659, 783, 1046, 880, 1046].forEach((f, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(f, t + idx * 0.14);
+            gain.gain.setValueAtTime(0.3, t + idx * 0.14);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.14 + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(t + idx * 0.14);
+            osc.stop(t + idx * 0.14 + 0.28);
+          });
         } else if (type === 'lullaby') {
           [523, 659, 783, 1046].forEach((f, idx) => {
             const osc = audioCtx.createOscillator();
@@ -655,24 +640,15 @@
       name: "",
       birthDate: new Date().toLocaleDateString('tr-TR'),
       day: 1,
-      stage: 1,
-      geminiApiKey: "",
+      stage: 1, // 1: Bebek, 2: Emekleme, 3: Çocuk, 4: Okul
+      bowColor: "sari", // sari, lacivert, pembe
       stage1Tasks: { feed: false, diaper: false, burp: false, lullaby: false },
       stage2Tasks: { prepMama: false, feedMama: false, diaper: false, rattle: false },
       stage3Tasks: { breakfast: false, toys: false, run: false, book: false },
-      stage4Tasks: { lunchbox: false, painting: false, chat: false, bag: false }
+      stage4Tasks: { lunchbox: false, painting: false, dance: false, bow: false, bag: false }
     };
 
-    let gameState = JSON.parse(localStorage.getItem('kizimiz_save_v12')) || defaultState;
-
-    // URL parametresinden API key alma (?key=AIzaSy...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const incomingKey = urlParams.get('key');
-    if (incomingKey && incomingKey.trim() !== "") {
-      gameState.geminiApiKey = incomingKey.trim();
-      localStorage.setItem('kizimiz_save_v12', JSON.stringify(gameState));
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+    let gameState = JSON.parse(localStorage.getItem('kizimiz_save_v20')) || defaultState;
 
     function renderTasks() {
       const container = document.getElementById('task-container');
@@ -724,6 +700,7 @@
           </button>
         `;
       } else {
+        // ⭐ 4. AŞAMA GÖREVLERİ (ŞARKI/DANS + TOKA SEÇİMİ ENTEGRE EDİLDİ) ⭐
         container.innerHTML = `
           <button class="task-btn ${gameState.stage4Tasks.lunchbox ? 'completed' : ''}" id="t-lunchbox" onclick="gorevYap('lunchbox')">
             <span>🥪</span> 1. Beslenme Çantası
@@ -731,11 +708,11 @@
           <button class="task-btn ${!gameState.stage4Tasks.lunchbox ? 'locked' : (gameState.stage4Tasks.painting ? 'completed' : '')}" id="t-painting" onclick="gorevYap('painting')">
             <span>🎨</span> 2. Okul Resmini İncele
           </button>
-          <button class="task-btn ${!gameState.stage4Tasks.painting ? 'locked' : (gameState.stage4Tasks.chat ? 'completed' : '')}" id="t-chat" onclick="sohbetAc()">
-            <span>💬</span> 3. Günün Sohbeti (AI)
+          <button class="task-btn ${!gameState.stage4Tasks.painting ? 'locked' : (gameState.stage4Tasks.dance ? 'completed' : '')}" id="t-dance" onclick="gorevYap('dance')">
+            <span>💃</span> 3. Şarkı & Dans Et
           </button>
-          <button class="task-btn ${!gameState.stage4Tasks.chat ? 'locked' : (gameState.stage4Tasks.bag ? 'completed' : '')}" id="t-bag" onclick="gorevYap('bag')">
-            <span>🎒</span> 4. Çanta Hazırla & Uyu
+          <button class="task-btn ${!gameState.stage4Tasks.dance ? 'locked' : (gameState.stage4Tasks.bow ? 'completed' : '')}" id="t-bow" onclick="tokaModalAc()">
+            <span>🎀</span> 4. Toka / Kıyafet Seç
           </button>
         `;
       }
@@ -758,7 +735,7 @@
         hepsiBitti = t.breakfast && t.toys && t.run && t.book;
       } else {
         const t = gameState.stage4Tasks;
-        hepsiBitti = t.lunchbox && t.painting && t.chat && t.bag;
+        hepsiBitti = t.lunchbox && t.painting && t.dance && t.bow;
       }
 
       if (hepsiBitti) {
@@ -783,7 +760,7 @@
     }
 
     function kaydet() {
-      localStorage.setItem('kizimiz_save_v12', JSON.stringify(gameState));
+      localStorage.setItem('kizimiz_save_v20', JSON.stringify(gameState));
       uiGuncelle();
     }
 
@@ -815,74 +792,33 @@
       else diyalogGoster("İyi ki benim annemsin! 💖");
     }
 
-    // --- GERÇEK GEMINI AI SOHBET MOTORU (TAM ENTEGRE) ---
-    function sohbetAc() {
-      if (!gameState.stage4Tasks.painting) {
-        diyalogGoster("Önce okulda çizdiğim resmi inceleyelim annecim! 🎨");
+    // --- TOKA SEÇİM SİSTEMİ ---
+    function tokaModalAc() {
+      if (!gameState.stage4Tasks.dance) {
+        diyalogGoster("Önce okul şarkımızı söyleyip dans edelim annecim! 💃🎶");
         return;
       }
-      document.getElementById('ai-chat-modal').style.display = 'flex';
-      document.getElementById('chat-title').innerText = `💬 ${gameState.name || 'Kızımız'} ile Sohbet`;
+      document.getElementById('bow-modal').style.display = 'flex';
     }
 
-    function sohbetKapat() {
-      document.getElementById('ai-chat-modal').style.display = 'none';
-    }
+    function renkSec(renk) {
+      gameState.bowColor = renk;
+      gameState.stage4Tasks.bow = true;
+      document.getElementById('bow-modal').style.display = 'none';
 
-    async function aiSoruSor() {
-      const inputEl = document.getElementById('chat-user-input');
-      const responseEl = document.getElementById('chat-response-text');
-      const soru = inputEl.value.trim();
-      if (!soru) return;
+      guncelleTokaRengi();
+      playSound('clean');
+      titre(50);
 
-      inputEl.value = "";
-      responseEl.innerText = "Düşünüyor... 🤔💭";
-
-      const apiKey = gameState.geminiApiKey;
-
-      if (!apiKey || apiKey.trim() === "") {
-        responseEl.innerText = "Annecim API anahtarı girilmemiş! Sağ üstteki Gün butonuna 3 kez tıkla ve anahtarı kaydet. 🔑";
-        return;
+      if (renk === 'sari') {
+        diyalogGoster("Güneş gibi parlayan sarı tokayı taktım annecim! 💛✨");
+      } else if (renk === 'lacivert') {
+        diyalogGoster("Yaşa Fenerbahçe! En büyük Fener tokası! 💙💛🎉");
+      } else {
+        diyalogGoster("En sevdiğim pembe fiyonkumu taktım, çok tatlı oldum! 💖🌸");
       }
 
-      try {
-        const systemPrompt = `Sen Sümeyye (annen) ve Alperen'in (baban) 5-6 yaşındaki çok tatlı, neşeli kızısın. Adın ${gameState.name || 'Kızın'}. Anasınıfına gidiyorsun. Fenerbahçelisin. Cümlelerin çocuksu, neşeli, kısa ve masum olsun (en fazla 2-3 cümle). Okuldaki arkadaşlarınla oyunlardan, boyamalardan ve anne-baba sevgisinden bahset. Annenin sorusuna doğrudan ve çocuksu cevap ver. Asla bir yapay zeka olduğunu belli etme.`;
-        
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: `${systemPrompt}\n\nAnnem bana şunu söyledi: "${soru}". Ona çocuksu cevabım:` }]
-              }
-            ]
-          })
-        });
-
-        const data = await res.json();
-        
-        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          const cevap = data.candidates[0].content.parts[0].text.trim();
-          responseEl.innerText = cevap;
-          diyalogGoster(cevap.substring(0, 45) + "...");
-          
-          if (!gameState.stage4Tasks.chat) {
-            gameState.stage4Tasks.chat = true;
-            kaydet();
-          }
-        } else if (data.error) {
-          responseEl.innerText = "Hata oluştu annecim: " + (data.error.message || "API Hatası");
-        } else {
-          responseEl.innerText = "Seni duyamadım annecim, bir daha söyler misin? 🌸";
-        }
-      } catch (err) {
-        console.error("API Fetch Hatası:", err);
-        responseEl.innerText = "İnternet bağlantımda bir sorun oldu annecim... Tekrar dener misin? 📶";
-      }
+      kaydet();
     }
 
     // --- ADMİN PANELİ FONKSİYONLARI ---
@@ -897,19 +833,11 @@
       if (clickCount >= 3) {
         clickCount = 0;
         document.getElementById('admin-day-input').value = gameState.day;
-        document.getElementById('admin-api-key').value = gameState.geminiApiKey || "";
         document.getElementById('admin-modal').style.display = 'flex';
       }
     }
 
     function adminKapat() { document.getElementById('admin-modal').style.display = 'none'; }
-
-    function adminApiKeyKaydet() {
-      const key = document.getElementById('admin-api-key').value.trim();
-      gameState.geminiApiKey = key;
-      kaydet();
-      alert("Gemini API Anahtarı başarıyla kaydedildi! 🔑✨");
-    }
 
     function adminGuneGit() {
       const targetDay = parseInt(document.getElementById('admin-day-input').value);
@@ -944,7 +872,7 @@
       if (gameState.stage === 1) gameState.stage1Tasks = { feed: true, diaper: true, burp: true, lullaby: true };
       else if (gameState.stage === 2) gameState.stage2Tasks = { prepMama: true, feedMama: true, diaper: true, rattle: true };
       else if (gameState.stage === 3) gameState.stage3Tasks = { breakfast: true, toys: true, run: true, book: true };
-      else gameState.stage4Tasks = { lunchbox: true, painting: true, chat: true, bag: true };
+      else gameState.stage4Tasks = { lunchbox: true, painting: true, dance: true, bow: true, bag: true };
       kaydet();
       adminKapat();
       diyalogGoster("Görevler tamamlandı! 🌙");
@@ -952,7 +880,7 @@
 
     function adminSifirla() {
       if (confirm("Oyun sıfırlansın mı?")) {
-        localStorage.removeItem('kizimiz_save_v12');
+        localStorage.removeItem('kizimiz_save_v20');
         location.reload();
       }
     }
@@ -985,7 +913,21 @@
     const eyeMat = new THREE.MeshBasicMaterial({ color: 0x33282b });
     const goldMat = new THREE.MeshLambertMaterial({ color: 0xfcc419 });
     const fbBlueMat = new THREE.MeshLambertMaterial({ color: 0x1e3799 });
+    const pinkBowMat = new THREE.MeshLambertMaterial({ color: 0xff7675 });
     const carpetMat = new THREE.MeshLambertMaterial({ color: 0xffe3e0 });
+
+    // Dinamik Toka Materyali
+    const dynamicBowMat = new THREE.MeshLambertMaterial({ color: 0xfcc419 });
+
+    function guncelleTokaRengi() {
+      if (gameState.bowColor === 'sari') {
+        dynamicBowMat.color.setHex(0xfcc419);
+      } else if (gameState.bowColor === 'lacivert') {
+        dynamicBowMat.color.setHex(0x1e3799);
+      } else {
+        dynamicBowMat.color.setHex(0xff7675);
+      }
+    }
 
     // 1. AŞAMA: BEŞİK
     const cribGroup = new THREE.Group();
@@ -1074,6 +1016,7 @@
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.52, 32, 32), skinMat);
     headGroup.add(head);
 
+    // 1. Aşama Bandana
     const newbornHeadGroup = new THREE.Group();
     const band = new THREE.Mesh(new THREE.TorusGeometry(0.53, 0.032, 16, 32), suitMat);
     band.rotation.x = Math.PI / 2.2;
@@ -1085,6 +1028,7 @@
     newbornHeadGroup.add(bow);
     headGroup.add(newbornHeadGroup);
 
+    // 2. Aşama Saçları
     const stage2HairGroup = new THREE.Group();
     const hairBunL = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), hairMat);
     hairBunL.position.set(-0.35, 0.48, 0);
@@ -1093,6 +1037,7 @@
     stage2HairGroup.add(hairBunL, hairBunR);
     headGroup.add(stage2HairGroup);
 
+    // 3. & 4. Aşama Saçları (Kumral Dalgalı Saçlar + Özelleştirilebilir Toka)
     const stage3HairGroup = new THREE.Group();
     const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.54, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), hairMat);
     hairTop.position.set(0, 0.05, -0.02);
@@ -1100,7 +1045,14 @@
     hairSideL.position.set(-0.45, -0.15, 0.05);
     const hairSideR = hairSideL.clone();
     hairSideR.position.x = 0.45;
-    stage3HairGroup.add(hairTop, hairSideL, hairSideR);
+
+    // Okul Dönemi Tokası (Rengi Değiştirilebilir)
+    const schoolBow = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 16), dynamicBowMat);
+    schoolBow.scale.set(1.6, 0.7, 0.7);
+    schoolBow.position.set(-0.25, 0.52, 0.22);
+    schoolBow.rotation.z = -0.3;
+
+    stage3HairGroup.add(hairTop, hairSideL, hairSideR, schoolBow);
     headGroup.add(stage3HairGroup);
 
     const eyeCurve = new THREE.TorusGeometry(0.065, 0.015, 8, 16, Math.PI);
@@ -1146,15 +1098,34 @@
     baby.add(headGroup);
     scene.add(baby);
 
+    let isDancing = false;
+    let danceStartTime = 0;
+
     let clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      babyBody.scale.y = 1.05 + Math.sin(t * 2.0) * 0.025;
-      headGroup.position.y = 0.25 + Math.sin(t * 2.0) * 0.012;
-      mobileGroup.rotation.y = t * 0.35;
+      if (isDancing) {
+        // Dans & Şarkı Animasyonu
+        baby.position.y = 0.25 + Math.abs(Math.sin(t * 8)) * 0.18;
+        baby.rotation.y = Math.sin(t * 6) * 0.45;
+        armL.rotation.z = Math.PI / 2 + Math.sin(t * 10) * 0.3;
+        armR.rotation.z = -Math.PI / 2 - Math.sin(t * 10) * 0.3;
 
+        if (t - danceStartTime > 3.2) {
+          isDancing = false;
+          baby.rotation.y = 0;
+          armL.rotation.z = Math.PI / 3.5;
+          armR.rotation.z = -Math.PI / 3.5;
+          baby.position.set(0, 0.25, 0.1);
+        }
+      } else {
+        babyBody.scale.y = 1.05 + Math.sin(t * 2.0) * 0.025;
+        headGroup.position.y = 0.25 + Math.sin(t * 2.0) * 0.012;
+      }
+
+      mobileGroup.rotation.y = t * 0.35;
       renderer.render(scene, camera);
     }
     animate();
@@ -1212,6 +1183,7 @@
         dress.visible = true;
         babyBody.visible = false;
         baby.position.set(0, 0.25, 0.1);
+        guncelleTokaRengi();
       }
     }
 
@@ -1317,6 +1289,7 @@
           playSound('lullaby'); titre(60); diyalogGoster("Bu masal çok güzelmiş... Gözlerim kapanıyor 📖💤");
         }
       } else {
+        // ⭐ 4. AŞAMA GÖREVLERİ ⭐
         if (tur === 'lunchbox') {
           if (gameState.stage4Tasks.lunchbox) { diyalogGoster("Beslenme çantam hazır annecim! 🥪"); return; }
           gameState.stage4Tasks.lunchbox = true;
@@ -1340,12 +1313,17 @@
 
           const bugununResmi = resimler[gameState.day] || "Bak annecim okulda çizdim! Çok güzel oldu değil mi? 🎨✨";
           diyalogGoster(bugununResmi);
-        } else if (tur === 'bag') {
-          if (!gameState.stage4Tasks.chat) { diyalogGoster("Önce bugünü konuşalım annecim! 💬"); return; }
-          if (gameState.stage4Tasks.bag) { diyalogGoster("Çantam hazır, uyuyabilirim! 🎒💤"); return; }
-          gameState.stage4Tasks.bag = true;
-          playSound('lullaby'); titre(60);
-          diyalogGoster("Yarın okulda arkadaşlarımla oynayacağım... İyi uykular annecim! 🎒🌙💤");
+        } else if (tur === 'dance') {
+          if (!gameState.stage4Tasks.painting) { diyalogGoster("Önce okul resmimi inceleyelim annecim! 🎨"); return; }
+          if (gameState.stage4Tasks.dance) { diyalogGoster("Şarkımızı söyledik bile! 🎶💃"); return; }
+          
+          gameState.stage4Tasks.dance = true;
+          isDancing = true;
+          danceStartTime = clock.getElapsedTime();
+          playSound('dance');
+          titre(70);
+
+          diyalogGoster("Okulumu pek çok severim! Bak nasıl dans ediyorum annecim! 💃🎶✨");
         }
       }
 
@@ -1375,7 +1353,7 @@
         gameState.stage1Tasks = { feed: false, diaper: false, burp: false, lullaby: false };
         gameState.stage2Tasks = { prepMama: false, feedMama: false, diaper: false, rattle: false };
         gameState.stage3Tasks = { breakfast: false, toys: false, run: false, book: false };
-        gameState.stage4Tasks = { lunchbox: false, painting: false, chat: false, bag: false };
+        gameState.stage4Tasks = { lunchbox: false, painting: false, dance: false, bow: false, bag: false };
 
         let buyumeMetni = "";
         if (gameState.day === 8 && gameState.stage === 1) {
@@ -1386,7 +1364,7 @@
           buyumeMetni = "Kızımız artık büyüdü, ayağa kalktı ve ilk cümlelerini kurmaya başladı! 🎀";
         } else if (gameState.day === 22 && gameState.stage === 3) {
           gameState.stage = 4;
-          buyumeMetni = "Kızımız anasınıfına başladı! Artık sırtında sarı-lacivert çantasıyla okula gidiyor ve seninle sohbet edebiliyor! 🎒🌸";
+          buyumeMetni = "Kızımız anasınıfına başladı! Artık sırtında sarı-lacivert çantasıyla okula gidiyor, şarkılar söylüyor! 🎒🌸";
         }
 
         kaydet();
