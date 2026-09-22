@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kızımız 👶</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👶</text></svg>">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kızımız">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    
+    body {
+      background: radial-gradient(circle at center, #fceade 0%, #f4acb7 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      height: 100dvh;
+      touch-action: none;
+      transition: background 1.5s ease;
+    }
+
+    body.night-mode {
+      background: radial-gradient(circle at center, #1e293b 0%, #0a0f1d 100%);
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* DOĞUM BELGESİ */
+    #birth-certificate-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 20px;
+      transition: opacity 0.5s ease;
+    }
+
+    .certificate-card {
+      background: #fffdfa;
+      width: 100%;
+      max-width: 350px;
+      border-radius: 26px;
+      border: 2px solid #fedfe1;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .cert-badge {
+      display: inline-block;
+      background: #ffeaa7;
+      color: #d63031;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    .cert-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #2d3436;
+      margin-bottom: 16px;
+    }
+
+    .cert-info-list {
+      background: #fff8f8;
+      border-radius: 16px;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 13px;
+      color: #636e72;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .cert-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #f1dede;
+      padding-bottom: 4px;
+    }
+    .cert-row:last-child { border-bottom: none; }
+    .cert-row b { color: #2d3436; }
+
+    .cert-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #fab1a0;
+      border-radius: 14px;
+      font-size: 15px;
+      text-align: center;
+      outline: none;
+      font-weight: 700;
+      color: #2d3436;
+    }
+
+    .cert-btn {
+      width: 100%;
+      background: #ff7675;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: bold;
+      margin-top: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 118, 117, 0.4);
+    }
+
+    /* BÜYÜME TEBRİK MODALI */
+    #level-up-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 150;
+      padding: 20px;
+    }
+    .level-card {
+      background: white;
+      border-radius: 28px;
+      padding: 30px 20px;
+      text-align: center;
+      max-width: 340px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes pop {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .level-card h2 { color: #e84393; font-size: 22px; margin-bottom: 10px; }
+    .level-card p { color: #636e72; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+    .level-btn {
+      background: #fd79a8;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* ADMİN / GELİŞTİRİCİ MODALI */
+    #admin-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 300;
+      padding: 20px;
+    }
+    .admin-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: white;
+      border-radius: 24px;
+      padding: 22px;
+      width: 100%;
+      max-width: 350px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .admin-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-close { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
+    .admin-group { margin-bottom: 12px; text-align: left; }
+    .admin-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: bold; }
+    .admin-row { display: flex; gap: 6px; }
+    .admin-input {
+      flex: 1; padding: 8px; border-radius: 10px; border: 1px solid #475569;
+      background: #0f172a; color: white; font-size: 13px; text-align: center;
+    }
+    .admin-btn {
+      padding: 8px 12px; background: #0284c7; color: white; border: none;
+      border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer;
+    }
+    .admin-btn.danger { background: #e11d48; }
+    .admin-btn.success { background: #059669; }
+
+    /* ⭐ GEMINI AI SOHBET PENCERESİ ⭐ */
+    #ai-chat-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 250;
+      padding: 15px;
+    }
+    .chat-box {
+      background: white;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 28px 28px 20px 20px;
+      padding: 20px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      color: #2d3436;
+      font-size: 15px;
+    }
+    .chat-response {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 14px;
+      color: #2d3436;
+      min-height: 60px;
+      line-height: 1.4;
+      border: 1px solid #edf2f7;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1.5px solid #fedfe1;
+      font-size: 14px;
+      outline: none;
+      color: #2d3436;
+    }
+    .chat-send-btn {
+      background: #e84393;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* HUD */
+    #hud {
+      position: absolute;
+      top: env(safe-area-inset-top, 20px);
+      left: 15px;
+      right: 15px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .baby-profile {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .baby-name { font-weight: 800; color: #2d3436; font-size: 14px; }
+    .baby-stage { font-size: 11px; color: #e84393; font-weight: 600; }
+
+    .day-badge {
+      background: #ff7675;
+      color: white;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 8px 14px;
+      border-radius: 18px;
+      cursor: pointer;
+    }
+
+    /* DİYALOG BALONU */
+    #dialogue {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 12px 20px;
+      border-radius: 22px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #2d3436;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 85%;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    #pat-guide {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(45, 52, 54, 0.9);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 22px;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 15;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    /* GÖREVLER PANELİ */
+    #task-container {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 20px) + 85px);
+      left: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .task-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1.5px solid #f1f2f6;
+      padding: 12px 10px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2d3436;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .task-btn.completed { background: #e8f8f5; border-color: #2ecc71; color: #27ae60; }
+    .task-btn.locked { opacity: 0.4; background: #f8f9fa; border-color: #e9ecef; cursor: not-allowed; }
+    .task-btn span { font-size: 20px; }
+
+    #end-day-btn {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 20px) + 20px);
+      left: 20px;
+      right: 20px;
+      padding: 15px;
+      background: #b2bec3;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      z-index: 10;
+      cursor: not-allowed;
+      opacity: 0.6;
+      transition: all 0.3s;
+    }
+    #end-day-btn.ready {
+      background: #6c5ce7;
+      opacity: 1;
+      cursor: pointer;
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    #transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #090e17;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+    #transition-overlay.active { opacity: 1; pointer-events: auto; }
+    .transition-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .transition-sub { font-size: 14px; color: #94a3b8; }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <div id="canvas-container"></div>
+
+  <!-- Doğum Belgesi -->
+  <div id="birth-certificate-modal">
+    <div class="certificate-card">
+      <div class="cert-badge">T.C. NÜFUS KAYDI</div>
+      <h2 class="cert-title">DOĞUM BELGESİ</h2>
+      
+      <div class="cert-info-list">
+        <div class="cert-row"><span>Anne Adı:</span> <b>Sümeyye</b></div>
+        <div class="cert-row"><span>Baba Adı:</span> <b>Alperen</b></div>
+        <div class="cert-row"><span>Soyadı:</span> <b>Akpınar</b></div>
+        <div class="cert-row"><span>Doğum Tarihi:</span> <b id="cert-date">--.--.----</b></div>
+      </div>
+
+      <div style="text-align: left; margin-bottom: 6px; font-size: 12px; font-weight: bold; color: #d63031;">KIZINIZIN ADI</div>
+      <input type="text" id="baby-name-input" class="cert-input" placeholder="İsim yazınız..." maxlength="15">
+
+      <button class="cert-btn" onclick="bebegiKaydet()">Kızımı Kucağıma Alayım 🤱</button>
+    </div>
+  </div>
+
+  <!-- Büyüme Tebrik Modalı -->
+  <div id="level-up-modal">
+    <div class="level-card">
+      <h2>🎉 BÜYÜDÜM! 🎉</h2>
+      <p id="level-up-text">Kızımız büyüdü!</p>
+      <button class="level-btn" onclick="modalKapat()">Kızıma Sarıl 💖</button>
+    </div>
+  </div>
+
+  <!-- GEMINI AI SOHBET PENCERESİ -->
+  <div id="ai-chat-modal">
+    <div class="chat-box">
+      <div class="chat-header">
+        <span id="chat-title">💬 Kızımızla Sohbet</span>
+        <button onclick="sohbetKapat()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <div class="chat-response" id="chat-response-text">
+        Annecim bugün okulda neler yaptık biliyor musun? Bana bir şey sor! 🌸
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-user-input" class="chat-input" placeholder="Kızına bir şey sor..." onkeydown="if(event.key==='Enter') aiSoruSor()">
+        <button class="chat-send-btn" onclick="aiSoruSor()">Sor 💌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Modalı -->
+  <div id="admin-modal">
+    <div class="admin-card">
+      <div class="admin-title">
+        <span>🛠️ Geliştirici Paneli</span>
+        <button class="admin-close" onclick="adminKapat()">✕</button>
+      </div>
+      
+      <div class="admin-group">
+        <label>İSTEDİĞİN GÜNE IŞINLAN:</label>
+        <div class="admin-row">
+          <input type="number" id="admin-day-input" class="admin-input" min="1" max="100" placeholder="Örn: 22">
+          <button class="admin-btn" onclick="adminGuneGit()">Git 🚀</button>
+        </div>
+      </div>
+
+      <div class="admin-group">
+        <label>AŞAMA SEÇ:</label>
+        <div class="admin-row">
+          <button class="admin-btn" style="flex:1;" onclick="adminAsamaDegis(1)">1. Bebek</button>
+          <button class="admin-btn" style="flex:1;" onclick="adminAsamaDegis(2)">2. Emekleme</button>
+          <button class="admin-btn" style="flex:1;" onclick="adminAsamaDegis(3)">3. Çocuk</button>
+          <button class="admin-btn" style="flex:1; background:#8e44ad;" onclick="adminAsamaDegis(4)">4. Okul</button>
+        </div>
+      </div>
+
+      <div class="admin-group">
+        <label>🔑 GEMINI API ANAHTARI (Aktif):</label>
+        <div class="admin-row">
+          <input type="password" id="admin-api-key" class="admin-input" placeholder="AI Studio Key..." style="text-align:left;">
+          <button class="admin-btn" onclick="adminApiKeyKaydet()">Kaydet</button>
+        </div>
+      </div>
+
+      <div class="admin-group">
+        <label>HIZLI İŞLEMLER:</label>
+        <div class="admin-row" style="margin-bottom: 8px;">
+          <button class="admin-btn success" style="width:100%;" onclick="adminGorevleriTamamla()">✓ Tüm Görevleri Bitir</button>
+        </div>
+        <div class="admin-row">
+          <button class="admin-btn danger" style="width:100%;" onclick="adminSifirla()">⚠️ Oyunu Sıfırla (Reset)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="baby-profile">
+      <div class="baby-name" id="display-name">Kızımız</div>
+      <div class="baby-stage" id="display-stage">1. Aşama: Yeni Doğan</div>
+    </div>
+    <div class="day-badge" id="display-day" onclick="adminTiklamaSayaci()">Gün 1</div>
+  </div>
+
+  <div id="dialogue">Maa... 💤</div>
+  <div id="pat-guide">Kızımızın sırtına dokunup pışpışla (0/3) 👋</div>
+
+  <!-- Dinamik Görevler Paneli -->
+  <div id="task-container"></div>
+
+  <button id="end-day-btn" onclick="gunuTamamla()">Bakımları Sırayla Yap ✨</button>
+
+  <div id="transition-overlay">
+    <div class="transition-title" id="trans-title">Gün Tamamlandı 💤</div>
+    <div class="transition-sub" id="trans-sub">Kızımız tatlı rüyalara daldı...</div>
+  </div>
+
+  <script>
+    // --- 1. SES SİSTEMİ ---
+    let audioCtx = null;
+    function unlockAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    window.addEventListener('touchstart', unlockAudio, { once: true });
+    window.addEventListener('pointerdown', unlockAudio, { once: true });
+
+    function playSound(type) {
+      unlockAudio();
+      if (!audioCtx) return;
+      try {
+        const t = audioCtx.currentTime;
+        if (type === 'feed' || type === 'prep') {
+          [0, 0.1, 0.2].forEach((delay, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(380 + idx * 80, t + delay);
+            gain.gain.setValueAtTime(0.3, t + delay);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + delay + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(t + delay);
+            osc.stop(t + delay + 0.09);
+          });
+        } else if (type === 'pat') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(140, t);
+          osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+          gain.gain.setValueAtTime(0.5, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t);
+          osc.stop(t + 0.13);
+        } else if (type === 'burp' || type === 'rattle' || type === 'play') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.setValueAtTime(420, t);
+          osc.frequency.exponentialRampToValueAtTime(850, t + 0.25);
+          gain.gain.setValueAtTime(0.35, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t);
+          osc.stop(t + 0.26);
+        } else if (type === 'diaper' || type === 'clean') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.setValueAtTime(540, t);
+          osc.frequency.exponentialRampToValueAtTime(950, t + 0.2);
+          gain.gain.setValueAtTime(0.3, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t);
+          osc.stop(t + 0.22);
+        } else if (type === 'lullaby') {
+          [523, 659, 783, 1046].forEach((f, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(f, t + idx * 0.2);
+            gain.gain.setValueAtTime(0.25, t + idx * 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.2 + 0.45);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(t + idx * 0.2);
+            osc.stop(t + idx * 0.2 + 0.5);
+          });
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function titre(ms = 35) {
+      if (navigator.vibrate) navigator.vibrate(ms);
+    }
+
+    // --- 2. DURUM YÖNETİMİ & SABİT API ANAHTARI ENTEGRASYONU ---
+    const HARDCODED_API_KEY = "AQ.Ab8RN6InC0Ouvuj_ktVYhZaovjTA1sv0US1aZCNPaqASF2HVVw";
+
+    const defaultState = {
+      name: "",
+      birthDate: new Date().toLocaleDateString('tr-TR'),
+      day: 1,
+      stage: 1, // 1: Bebek (1-7), 2: Emekleme (8-14), 3: Çocuk (15-21), 4: Anasınıfı (22-28)
+      geminiApiKey: HARDCODED_API_KEY,
+      stage1Tasks: { feed: false, diaper: false, burp: false, lullaby: false },
+      stage2Tasks: { prepMama: false, feedMama: false, diaper: false, rattle: false },
+      stage3Tasks: { breakfast: false, toys: false, run: false, book: false },
+      stage4Tasks: { lunchbox: false, painting: false, chat: false, bag: false }
+    };
+
+    let gameState = JSON.parse(localStorage.getItem('kizimiz_save_v10')) || defaultState;
+    if (!gameState.geminiApiKey || gameState.geminiApiKey === "") {
+      gameState.geminiApiKey = HARDCODED_API_KEY;
+    }
+
+    function renderTasks() {
+      const container = document.getElementById('task-container');
+      container.innerHTML = "";
+
+      if (gameState.stage === 1) {
+        container.innerHTML = `
+          <button class="task-btn ${gameState.stage1Tasks.feed ? 'completed' : ''}" id="t-feed" onclick="gorevYap('feed')">
+            <span>🤱</span> 1. Emzir
+          </button>
+          <button class="task-btn ${!gameState.stage1Tasks.feed ? 'locked' : (gameState.stage1Tasks.diaper ? 'completed' : '')}" id="t-diaper" onclick="gorevYap('diaper')">
+            <span>🧷</span> 2. Alt Değiştir
+          </button>
+          <button class="task-btn ${!gameState.stage1Tasks.diaper ? 'locked' : (gameState.stage1Tasks.burp ? 'completed' : '')}" id="t-burp" onclick="gazModunuBaslat()">
+            <span>💨</span> 3. Gazını Çıkar
+          </button>
+          <button class="task-btn ${!gameState.stage1Tasks.burp ? 'locked' : (gameState.stage1Tasks.lullaby ? 'completed' : '')}" id="t-lullaby" onclick="gorevYap('lullaby')">
+            <span>🎶</span> 4. Ninni Söyle
+          </button>
+        `;
+      } else if (gameState.stage === 2) {
+        container.innerHTML = `
+          <button class="task-btn ${gameState.stage2Tasks.prepMama ? 'completed' : ''}" id="t-prepMama" onclick="gorevYap('prepMama')">
+            <span>🥣</span> 1. Mama Hazırla
+          </button>
+          <button class="task-btn ${!gameState.stage2Tasks.prepMama ? 'locked' : (gameState.stage2Tasks.feedMama ? 'completed' : '')}" id="t-feedMama" onclick="gorevYap('feedMama')">
+            <span>🥄</span> 2. Mama Yedir
+          </button>
+          <button class="task-btn ${!gameState.stage2Tasks.feedMama ? 'locked' : (gameState.stage2Tasks.diaper ? 'completed' : '')}" id="t-diaper2" onclick="gorevYap('diaper2')">
+            <span>🧷</span> 3. Alt Değiştir
+          </button>
+          <button class="task-btn ${!gameState.stage2Tasks.diaper ? 'locked' : (gameState.stage2Tasks.rattle ? 'completed' : '')}" id="t-rattle" onclick="gorevYap('rattle')">
+            <span>💛💙</span> 4. Çıngırakla Oyna
+          </button>
+        `;
+      } else if (gameState.stage === 3) {
+        container.innerHTML = `
+          <button class="task-btn ${gameState.stage3Tasks.breakfast ? 'completed' : ''}" id="t-breakfast" onclick="gorevYap('breakfast')">
+            <span>🍎</span> 1. Kahvaltı Ver
+          </button>
+          <button class="task-btn ${!gameState.stage3Tasks.breakfast ? 'locked' : (gameState.stage3Tasks.toys ? 'completed' : '')}" id="t-toys" onclick="gorevYap('toys')">
+            <span>🧸</span> 2. Oyuncak Topla
+          </button>
+          <button class="task-btn ${!gameState.stage3Tasks.toys ? 'locked' : (gameState.stage3Tasks.run ? 'completed' : '')}" id="t-run" onclick="gorevYap('run')">
+            <span>🏃‍♀️</span> 3. Parkur / Oyun
+          </button>
+          <button class="task-btn ${!gameState.stage3Tasks.run ? 'locked' : (gameState.stage3Tasks.book ? 'completed' : '')}" id="t-book" onclick="gorevYap('book')">
+            <span>📖</span> 4. Masal Oku
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button class="task-btn ${gameState.stage4Tasks.lunchbox ? 'completed' : ''}" id="t-lunchbox" onclick="gorevYap('lunchbox')">
+            <span>🥪</span> 1. Beslenme Çantası
+          </button>
+          <button class="task-btn ${!gameState.stage4Tasks.lunchbox ? 'locked' : (gameState.stage4Tasks.painting ? 'completed' : '')}" id="t-painting" onclick="gorevYap('painting')">
+            <span>🎨</span> 2. Okul Resmini İncele
+          </button>
+          <button class="task-btn ${!gameState.stage4Tasks.painting ? 'locked' : (gameState.stage4Tasks.chat ? 'completed' : '')}" id="t-chat" onclick="sohbetAc()">
+            <span>💬</span> 3. Günün Sohbeti (AI)
+          </button>
+          <button class="task-btn ${!gameState.stage4Tasks.chat ? 'locked' : (gameState.stage4Tasks.bag ? 'completed' : '')}" id="t-bag" onclick="gorevYap('bag')">
+            <span>🎒</span> 4. Çanta Hazırla & Uyu
+          </button>
+        `;
+      }
+
+      checkEndDay();
+    }
+
+    function checkEndDay() {
+      const endBtn = document.getElementById('end-day-btn');
+      let hepsiBitti = false;
+
+      if (gameState.stage === 1) {
+        const t = gameState.stage1Tasks;
+        hepsiBitti = t.feed && t.diaper && t.burp && t.lullaby;
+      } else if (gameState.stage === 2) {
+        const t = gameState.stage2Tasks;
+        hepsiBitti = t.prepMama && t.feedMama && t.diaper && t.rattle;
+      } else if (gameState.stage === 3) {
+        const t = gameState.stage3Tasks;
+        hepsiBitti = t.breakfast && t.toys && t.run && t.book;
+      } else {
+        const t = gameState.stage4Tasks;
+        hepsiBitti = t.lunchbox && t.painting && t.chat && t.bag;
+      }
+
+      if (hepsiBitti) {
+        endBtn.classList.add('ready');
+        endBtn.innerText = "Günü Tamamla / Uyu 🌙 (Hazır!)";
+      } else {
+        endBtn.classList.remove('ready');
+        endBtn.innerText = "Bakımları Sırayla Yap ✨";
+      }
+    }
+
+    function uiGuncelle() {
+      document.getElementById('display-name').innerText = gameState.name || "Kızımız";
+      document.getElementById('display-day').innerText = "Gün " + gameState.day;
+      
+      if (gameState.stage === 1) document.getElementById('display-stage').innerText = "1. Aşama: Yeni Doğan";
+      else if (gameState.stage === 2) document.getElementById('display-stage').innerText = "2. Aşama: Emekleme Dönemi";
+      else if (gameState.stage === 3) document.getElementById('display-stage').innerText = "3. Aşama: Oyun Çocuğu (Kreş)";
+      else document.getElementById('display-stage').innerText = "4. Aşama: Anasınıfı Öğrencisi 🎒";
+      
+      renderTasks();
+    }
+
+    function kaydet() {
+      localStorage.setItem('kizimiz_save_v10', JSON.stringify(gameState));
+      uiGuncelle();
+    }
+
+    document.getElementById('cert-date').innerText = gameState.birthDate;
+    if (gameState.name && gameState.name.trim() !== "") {
+      document.getElementById('birth-certificate-modal').style.display = "none";
+    }
+
+    function bebegiKaydet() {
+      const input = document.getElementById('baby-name-input').value.trim();
+      if (!input) {
+        alert("Lütfen kızımıza güzel bir isim verin ❤️");
+        return;
+      }
+      gameState.name = input;
+      kaydet();
+      
+      const modal = document.getElementById('birth-certificate-modal');
+      modal.style.opacity = '0';
+      setTimeout(() => modal.style.display = 'none', 500);
+      diyalogGoster("Ingaaa! 🍼🌸");
+      playSound('lullaby');
+      titre(60);
+    }
+
+    function modalKapat() {
+      document.getElementById('level-up-modal').style.display = 'none';
+      diyalogGoster("İyi ki benim annemsin! 💖");
+    }
+
+    // --- GEMINI AI SOHBET MOTORU (KONUŞMA DÜZELTİLDİ) ---
+    function sohbetAc() {
+      if (!gameState.stage4Tasks.painting) {
+        diyalogGoster("Önce okulda çizdiğim resmi inceleyelim annecim! 🎨");
+        return;
+      }
+      document.getElementById('ai-chat-modal').style.display = 'flex';
+      document.getElementById('chat-title').innerText = `💬 ${gameState.name || 'Kızımız'} ile Sohbet`;
+    }
+
+    function sohbetKapat() {
+      document.getElementById('ai-chat-modal').style.display = 'none';
+    }
+
+    async function aiSoruSor() {
+      const inputEl = document.getElementById('chat-user-input');
+      const responseEl = document.getElementById('chat-response-text');
+      const soru = inputEl.value.trim();
+      if (!soru) return;
+
+      inputEl.value = "";
+      responseEl.innerText = "Düşünüyor... 🤔💭";
+
+      const apiKey = gameState.geminiApiKey || HARDCODED_API_KEY;
+
+      // API Bağlantı Yöntemi Değiştirildi (Güvenlik engeli için URL parametresi)
+      if (apiKey && apiKey.trim() !== "") {
+        try {
+          const systemPrompt = `Sen Sümeyye (annen) ve Alperen'in (baban) 5-6 yaşındaki çok tatlı, neşeli kızısın. Adın ${gameState.name || 'Kızın'}. Anasınıfına gidiyorsun. Fenerbahçelisin. Cümlelerin çocuksu, neşeli, kısa ve masum olsun (en fazla 2-3 cümle). Okuldaki arkadaşlarınla oyunlardan, boyamalardan ve anne-baba sevgisinden bahset. Soruya çocuksu ve kısa bir cevap ver. Asla bir yapay zeka olduğunu söyleme.`;
+          
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: `${systemPrompt}\n\nAnnen sana şunu sordu: "${soru}"` }]
+              }]
+            })
+          });
+
+          const data = await res.json();
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const cevap = data.candidates[0].content.parts[0].text.trim();
+            responseEl.innerText = cevap;
+            diyalogGoster(cevap.substring(0, 40) + "...");
+            tamamlaChatGorevi();
+            return;
+          } else if (data.error) {
+            console.error("Gemini API Hatası:", data.error.message);
+            responseEl.innerText = "Düşünürken kafam karıştı annecim... 🤯 (Hata: " + data.error.message.substring(0,30) + ")";
+          }
+        } catch (e) {
+          console.error("Bağlantı Hatası:", e);
+          responseEl.innerText = "Bağlantım koptu sanırım annecim... 🤔💭";
+        }
+      }
+
+      // ⭐ Emniyet Sibobu (Yedek Yanıt Motoru - Geliştirildi) ⭐
+      setTimeout(() => {
+        const s = soru.toLowerCase();
+        let cevap = "Bilmem ki annecim, Agu agu! 🌸"; // Varsayılan çocuksu cevap
+
+        // Konuya Göre Yedek Cevaplar
+        if (s.includes('nasılsın')) {
+          cevap = "Çok iyiyim annecim, seninle oyun oynamak çok eğlenceli! 😊🌸";
+        } else if (s.includes('baba') || s.includes('alperen')) {
+          cevap = "Babam ne zaman gelecek? Onunla maç izlemek istiyorum! 💛💙";
+        } else if (s.includes('seviyor')) {
+          cevap = "Kocaman kocaman seviyorum! Dünyalar kadar! 🥰💖";
+        } else if (s.includes('yemek') || s.includes('beslenme')) {
+          cevap = "Karnım biraz acıktı annecim, ne zaman yemek yiyeceğiz? 🍎🥄";
+        } else if (s.includes('resim') || s.includes('okul')) {
+          cevap = "Bugün okulda kelebek çizdik, öğretmenim çok beğendi! 🎨🦋";
+        } else if (s.includes('fenerbahçe') || s.includes('fener')) {
+          cevap = "En büyük Fener! Şampiyon Fener! 💛💙🎉";
+        }
+
+        responseEl.innerText = cevap;
+        diyalogGoster(cevap);
+        tamamlaChatGorevi();
+      }, 700);
+    }
+
+    function tamamlaChatGorevi() {
+      if (!gameState.stage4Tasks.chat) {
+        gameState.stage4Tasks.chat = true;
+        kaydet();
+      }
+    }
+
+    // --- ADMİN PANELİ FONKSİYONLARI ---
+    let clickCount = 0;
+    let clickTimer = null;
+
+    function adminTiklamaSayaci() {
+      clickCount++;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => { clickCount = 0; }, 800);
+
+      if (clickCount >= 3) {
+        clickCount = 0;
+        document.getElementById('admin-day-input').value = gameState.day;
+        document.getElementById('admin-api-key').value = gameState.geminiApiKey || "";
+        document.getElementById('admin-modal').style.display = 'flex';
+      }
+    }
+
+    function adminKapat() { document.getElementById('admin-modal').style.display = 'none'; }
+
+    function adminApiKeyKaydet() {
+      const key = document.getElementById('admin-api-key').value.trim();
+      gameState.geminiApiKey = key;
+      kaydet();
+      alert("Gemini API Anahtarı güncellendi! 🔑✨");
+    }
+
+    function adminGuneGit() {
+      const targetDay = parseInt(document.getElementById('admin-day-input').value);
+      if (isNaN(targetDay) || targetDay < 1) return;
+
+      gameState.day = targetDay;
+      if (targetDay >= 22) gameState.stage = 4;
+      else if (targetDay >= 15) gameState.stage = 3;
+      else if (targetDay >= 8) gameState.stage = 2;
+      else gameState.stage = 1;
+
+      kaydet();
+      applyStageVisuals();
+      adminKapat();
+      diyalogGoster(`Gün ${targetDay}'e gidildi! 🚀`);
+    }
+
+    function adminAsamaDegis(asamaNo) {
+      gameState.stage = asamaNo;
+      if (asamaNo === 1) gameState.day = 1;
+      else if (asamaNo === 2) gameState.day = 8;
+      else if (asamaNo === 3) gameState.day = 15;
+      else if (asamaNo === 4) gameState.day = 22;
+      
+      kaydet();
+      applyStageVisuals();
+      adminKapat();
+      diyalogGoster(`${asamaNo}. Aşama Aktif! ✨`);
+    }
+
+    function adminGorevleriTamamla() {
+      if (gameState.stage === 1) gameState.stage1Tasks = { feed: true, diaper: true, burp: true, lullaby: true };
+      else if (gameState.stage === 2) gameState.stage2Tasks = { prepMama: true, feedMama: true, diaper: true, rattle: true };
+      else if (gameState.stage === 3) gameState.stage3Tasks = { breakfast: true, toys: true, run: true, book: true };
+      else gameState.stage4Tasks = { lunchbox: true, painting: true, chat: true, bag: true };
+      kaydet();
+      adminKapat();
+      diyalogGoster("Görevler tamamlandı! 🌙");
+    }
+
+    function adminSifirla() {
+      if (confirm("Oyun sıfırlansın mı?")) {
+        localStorage.removeItem('kizimiz_save_v10');
+        location.reload();
+      }
+    }
+
+    // --- 3. THREE.JS 3D SAHNE ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0.6, 3.4);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffecd2, 0.85);
+    scene.add(ambientLight);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.45);
+    keyLight.position.set(1.5, 3, 3);
+    scene.add(keyLight);
+
+    // MATERYALLER
+    const skinMat = new THREE.MeshLambertMaterial({ color: 0xffdbcd });
+    const suitMat = new THREE.MeshLambertMaterial({ color: 0xf39fa9 });
+    const dressMat = new THREE.MeshLambertMaterial({ color: 0xff7675 });
+    const hairMat = new THREE.MeshLambertMaterial({ color: 0x8d5b4c });
+    const cribMat = new THREE.MeshLambertMaterial({ color: 0xdec1a9 });
+    const pillowMat = new THREE.MeshLambertMaterial({ color: 0xfffcf7 });
+    const cheekMat = new THREE.MeshBasicMaterial({ color: 0xf87185 });
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x33282b });
+    const goldMat = new THREE.MeshLambertMaterial({ color: 0xfcc419 });
+    const fbBlueMat = new THREE.MeshLambertMaterial({ color: 0x1e3799 });
+    const carpetMat = new THREE.MeshLambertMaterial({ color: 0xffe3e0 });
+
+    // 1. AŞAMA: BEŞİK
+    const cribGroup = new THREE.Group();
+    const cribBase = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 2.0), pillowMat);
+    cribBase.position.set(0, -0.9, -0.4);
+    cribGroup.add(cribBase);
+
+    const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.2, 0.3), pillowMat);
+    pillow.position.set(0, 0.05, -0.7);
+    pillow.rotation.x = 0.25;
+    cribGroup.add(pillow);
+
+    const railL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.9, 2.0), cribMat);
+    railL.position.set(-1.15, -0.3, -0.4);
+    const railR = railL.clone();
+    railR.position.x = 1.15;
+    cribGroup.add(railL, railR);
+
+    const mobileGroup = new THREE.Group();
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.12), goldMat);
+      star.position.set(Math.cos(angle) * 0.75, 1.55, Math.sin(angle) * 0.75 - 0.4);
+      mobileGroup.add(star);
+    }
+    cribGroup.add(mobileGroup);
+    scene.add(cribGroup);
+
+    // HALI
+    const carpetGroup = new THREE.Group();
+    const carpet = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.05, 32), carpetMat);
+    carpet.position.set(0, -0.9, -0.2);
+    carpetGroup.add(carpet);
+    scene.add(carpetGroup);
+
+    // KARAKTER
+    const baby = new THREE.Group();
+
+    const babyBody = new THREE.Mesh(new THREE.SphereGeometry(0.55, 32, 32), suitMat);
+    babyBody.scale.set(0.95, 1.05, 0.85);
+    babyBody.position.set(0, -0.42, -0.2);
+    baby.add(babyBody);
+
+    const dress = new THREE.Mesh(new THREE.ConeGeometry(0.58, 0.65, 32), dressMat);
+    dress.position.set(0, -0.5, -0.2);
+    dress.visible = false;
+    baby.add(dress);
+
+    const backpackGroup = new THREE.Group();
+    const bagBase = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.5, 0.22), fbBlueMat);
+    const bagPocket = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.25, 0.1), goldMat);
+    bagPocket.position.set(0, -0.1, -0.12);
+    backpackGroup.add(bagBase, bagPocket);
+    backpackGroup.position.set(0, -0.4, -0.5);
+    backpackGroup.visible = false;
+    baby.add(backpackGroup);
+
+    const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.38, 16), suitMat);
+    armL.position.set(-0.48, -0.38, -0.05);
+    armL.rotation.z = Math.PI / 3.5;
+    armL.rotation.y = 0.4;
+    const armR = armL.clone();
+    armR.position.x = 0.48;
+    armR.rotation.z = -Math.PI / 3.5;
+    armR.rotation.y = -0.4;
+    baby.add(armL, armR);
+
+    const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.4, 16), suitMat);
+    legL.position.set(-0.25, -0.72, 0.05);
+    legL.rotation.x = Math.PI / 2.3;
+    const legR = legL.clone();
+    legR.position.x = 0.25;
+    baby.add(legL, legR);
+
+    const footL = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), suitMat);
+    footL.scale.set(0.85, 0.7, 1.2);
+    footL.position.set(-0.25, -0.68, 0.28);
+    const footR = footL.clone();
+    footR.position.x = 0.25;
+    baby.add(footL, footR);
+
+    // KAFA
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0, 0.25, -0.15);
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.52, 32, 32), skinMat);
+    headGroup.add(head);
+
+    const newbornHeadGroup = new THREE.Group();
+    const band = new THREE.Mesh(new THREE.TorusGeometry(0.53, 0.032, 16, 32), suitMat);
+    band.rotation.x = Math.PI / 2.2;
+    band.position.set(0, 0.1, -0.02);
+    newbornHeadGroup.add(band);
+    const bow = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 16), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    bow.scale.set(1.5, 0.7, 0.7);
+    bow.position.set(0, 0.58, 0.12);
+    newbornHeadGroup.add(bow);
+    headGroup.add(newbornHeadGroup);
+
+    const stage2HairGroup = new THREE.Group();
+    const hairBunL = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), hairMat);
+    hairBunL.position.set(-0.35, 0.48, 0);
+    const hairBunR = hairBunL.clone();
+    hairBunR.position.x = 0.35;
+    stage2HairGroup.add(hairBunL, hairBunR);
+    headGroup.add(stage2HairGroup);
+
+    const stage3HairGroup = new THREE.Group();
+    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.54, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), hairMat);
+    hairTop.position.set(0, 0.05, -0.02);
+    const hairSideL = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 0.65, 16), hairMat);
+    hairSideL.position.set(-0.45, -0.15, 0.05);
+    const hairSideR = hairSideL.clone();
+    hairSideR.position.x = 0.45;
+    stage3HairGroup.add(hairTop, hairSideL, hairSideR);
+    headGroup.add(stage3HairGroup);
+
+    const eyeCurve = new THREE.TorusGeometry(0.065, 0.015, 8, 16, Math.PI);
+    const eyeL = new THREE.Mesh(eyeCurve, eyeMat);
+    eyeL.rotation.x = 0.2;
+    eyeL.position.set(-0.17, 0.05, 0.46);
+    const eyeR = eyeL.clone();
+    eyeR.position.x = 0.17;
+    headGroup.add(eyeL, eyeR);
+
+    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), skinMat);
+    nose.position.set(0, -0.03, 0.51);
+    headGroup.add(nose);
+
+    const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), cheekMat);
+    cheekL.scale.set(1, 0.5, 0.2);
+    cheekL.position.set(-0.27, -0.08, 0.42);
+    const cheekR = cheekL.clone();
+    cheekR.position.x = 0.27;
+    headGroup.add(cheekL, cheekR);
+
+    const paci = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 16), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    paci.position.set(0, -0.16, 0.47);
+    headGroup.add(paci);
+
+    const rattleGroup = new THREE.Group();
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25), goldMat);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.035, 12, 24), fbBlueMat);
+    ring.position.y = 0.14;
+    rattleGroup.add(handle, ring);
+    rattleGroup.position.set(0.55, -0.3, 0.1);
+    rattleGroup.rotation.z = 0.3;
+    scene.add(rattleGroup);
+
+    const toyBlocks = new THREE.Group();
+    const block1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), goldMat);
+    block1.position.set(0.65, -0.75, 0.3);
+    const block2 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.18), fbBlueMat);
+    block2.position.set(0.65, -0.56, 0.3);
+    toyBlocks.add(block1, block2);
+    scene.add(toyBlocks);
+
+    baby.add(headGroup);
+    scene.add(baby);
+
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      babyBody.scale.y = 1.05 + Math.sin(t * 2.0) * 0.025;
+      headGroup.position.y = 0.25 + Math.sin(t * 2.0) * 0.012;
+      mobileGroup.rotation.y = t * 0.35;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function applyStageVisuals() {
+      if (gameState.stage === 1) {
+        cribGroup.visible = true;
+        carpetGroup.visible = false;
+        newbornHeadGroup.visible = true;
+        stage2HairGroup.visible = false;
+        stage3HairGroup.visible = false;
+        paci.visible = true;
+        rattleGroup.visible = false;
+        toyBlocks.visible = false;
+        backpackGroup.visible = false;
+        dress.visible = false;
+        babyBody.visible = true;
+        baby.position.set(0, 0, 0);
+      } else if (gameState.stage === 2) {
+        cribGroup.visible = false;
+        carpetGroup.visible = true;
+        newbornHeadGroup.visible = false;
+        stage2HairGroup.visible = true;
+        stage3HairGroup.visible = false;
+        paci.visible = false;
+        rattleGroup.visible = true;
+        toyBlocks.visible = false;
+        backpackGroup.visible = false;
+        dress.visible = false;
+        babyBody.visible = true;
+        baby.position.set(0, 0.05, 0.2);
+      } else if (gameState.stage === 3) {
+        cribGroup.visible = false;
+        carpetGroup.visible = true;
+        newbornHeadGroup.visible = false;
+        stage2HairGroup.visible = false;
+        stage3HairGroup.visible = true;
+        paci.visible = false;
+        rattleGroup.visible = false;
+        toyBlocks.visible = true;
+        backpackGroup.visible = false;
+        dress.visible = true;
+        babyBody.visible = false;
+        baby.position.set(0, 0.2, 0.1);
+      } else {
+        cribGroup.visible = false;
+        carpetGroup.visible = true;
+        newbornHeadGroup.visible = false;
+        stage2HairGroup.visible = false;
+        stage3HairGroup.visible = true;
+        paci.visible = false;
+        rattleGroup.visible = false;
+        toyBlocks.visible = false;
+        backpackGroup.visible = true;
+        dress.visible = true;
+        babyBody.visible = false;
+        baby.position.set(0, 0.25, 0.1);
+      }
+    }
+
+    // --- 4. ETKİLEŞİMLER ---
+    const dialogueEl = document.getElementById('dialogue');
+    const patGuide = document.getElementById('pat-guide');
+    let dTimeout;
+
+    function diyalogGoster(metin) {
+      clearTimeout(dTimeout);
+      dialogueEl.innerText = metin;
+      dialogueEl.style.opacity = '1';
+      dialogueEl.style.transform = 'translate(-50%, -60%)';
+      dTimeout = setTimeout(() => {
+        dialogueEl.style.opacity = '0';
+        dialogueEl.style.transform = 'translate(-50%, -50%)';
+      }, 3000);
+    }
+
+    let pispislamaAktif = false;
+    let patCount = 0;
+
+    function gazModunuBaslat() {
+      if (!gameState.stage1Tasks.diaper) { diyalogGoster("Ingaaaa! 🧷"); return; }
+      if (gameState.stage1Tasks.burp) { diyalogGoster("Aguuu... 💨"); return; }
+      pispislamaAktif = true;
+      patCount = 0;
+      patGuide.innerText = "Kızımızın sırtına dokunup pışpışla (0/3) 👋";
+      patGuide.style.opacity = '1';
+      diyalogGoster("Mıh... Mıh... 💨");
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      if (pispislamaAktif && e.clientY < window.innerHeight - 150 && e.clientY > 100) {
+        patCount++;
+        playSound('pat');
+        titre(40);
+        baby.position.y += 0.03;
+        setTimeout(() => baby.position.y -= 0.03, 120);
+
+        patGuide.innerText = `Kızımızın sırtına dokunup pışpışla (${patCount}/3) 👋`;
+        if (patCount >= 3) {
+          pispislamaAktif = false;
+          patGuide.style.opacity = '0';
+          playSound('burp');
+          titre(80);
+          diyalogGoster("Gaaak! 💨");
+          gameState.stage1Tasks.burp = true;
+          kaydet();
+        }
+      }
+    });
+
+    function gorevYap(tur) {
+      if (gameState.stage === 1) {
+        if (tur === 'diaper' && !gameState.stage1Tasks.feed) { diyalogGoster("Ingaaa! Ingaaa! 🍼"); return; }
+        if (tur === 'lullaby' && !gameState.stage1Tasks.burp) { diyalogGoster("Ingaaa! 💨"); return; }
+        if (gameState.stage1Tasks[tur]) return;
+        gameState.stage1Tasks[tur] = true;
+        if (tur === 'feed') { playSound('feed'); titre(50); diyalogGoster("Guluk guluk... 🌸"); }
+        else if (tur === 'diaper') { playSound('diaper'); titre(40); diyalogGoster("Aguuu... 😊"); }
+        else if (tur === 'lullaby') { playSound('lullaby'); titre(60); diyalogGoster("Mmm... Zzz... 💤"); }
+      } else if (gameState.stage === 2) {
+        if (tur === 'prepMama') {
+          if (gameState.stage2Tasks.prepMama) { diyalogGoster("Ma-ma! 🥣"); return; }
+          gameState.stage2Tasks.prepMama = true;
+          playSound('prep'); titre(45); diyalogGoster("Ma-ma! Ma-ma! 🥣✨");
+        } else if (tur === 'feedMama') {
+          if (!gameState.stage2Tasks.prepMama) { diyalogGoster("Ma-ma? 🥣"); return; }
+          if (gameState.stage2Tasks.feedMama) { diyalogGoster("Ham ham! 🥄"); return; }
+          gameState.stage2Tasks.feedMama = true;
+          playSound('feed'); titre(50); diyalogGoster("Ham ham! Ma-ma! 🥄😋");
+        } else if (tur === 'diaper2') {
+          if (!gameState.stage2Tasks.feedMama) { diyalogGoster("Ma-ma! 🥄"); return; }
+          if (gameState.stage2Tasks.diaper) { diyalogGoster("Aguuu! 🧷"); return; }
+          gameState.stage2Tasks.diaper = true;
+          playSound('diaper'); titre(40); diyalogGoster("An-neee! Aguu! 🧷");
+        } else if (tur === 'rattle') {
+          if (!gameState.stage2Tasks.diaper) { diyalogGoster("Ingaa! 🧷"); return; }
+          if (gameState.stage2Tasks.rattle) { diyalogGoster("Aguu! 💛💙"); return; }
+          gameState.stage2Tasks.rattle = true;
+          playSound('rattle'); titre(60); diyalogGoster("Ba-ba! Fe-ner! Şıkır şıkır! 💛💙🎉");
+        }
+      } else if (gameState.stage === 3) {
+        if (tur === 'breakfast') {
+          if (gameState.stage3Tasks.breakfast) { diyalogGoster("Karnım doydu annecim! 🍎"); return; }
+          gameState.stage3Tasks.breakfast = true;
+          playSound('feed'); titre(50); diyalogGoster("Meyveler çok tatlıymış annecim! 🍎😋");
+        } else if (tur === 'toys') {
+          if (!gameState.stage3Tasks.breakfast) { diyalogGoster("Önce kahvaltımı yapayım annecim! 🍎"); return; }
+          if (gameState.stage3Tasks.toys) { diyalogGoster("Odam tertemiz oldu! 🧸"); return; }
+          gameState.stage3Tasks.toys = true;
+          playSound('clean'); titre(40); diyalogGoster("Bak sarı-lacivert blokları dizdim! 🧸✨");
+        } else if (tur === 'run') {
+          if (!gameState.stage3Tasks.toys) { diyalogGoster("Önce odamı toplamalıyız annecim! 🧸"); return; }
+          if (gameState.stage3Tasks.run) { diyalogGoster("Çok yoruldum annecim! 🏃‍♀️"); return; }
+          gameState.stage3Tasks.run = true;
+          playSound('play'); titre(60); diyalogGoster("Fenerbahçe gol atınca böyle koşuyorum! 🏃‍♀️💛💙");
+        } else if (tur === 'book') {
+          if (!gameState.stage3Tasks.run) { diyalogGoster("Henüz uykum gelmedi annecim! 🏃‍♀️"); return; }
+          if (gameState.stage3Tasks.book) { diyalogGoster("İyi uykular annecim... 📖💤"); return; }
+          gameState.stage3Tasks.book = true;
+          playSound('lullaby'); titre(60); diyalogGoster("Bu masal çok güzelmiş... Gözlerim kapanıyor 📖💤");
+        }
+      } else {
+        if (tur === 'lunchbox') {
+          if (gameState.stage4Tasks.lunchbox) { diyalogGoster("Beslenme çantam hazır annecim! 🥪"); return; }
+          gameState.stage4Tasks.lunchbox = true;
+          playSound('prep'); titre(50);
+          diyalogGoster("Ellerine sağlık annecim, beslenme çantamı aldım! 🥪✨");
+        } else if (tur === 'painting') {
+          if (!gameState.stage4Tasks.lunchbox) { diyalogGoster("Önce beslenmemi hazırlayalım annecim! 🥪"); return; }
+          if (gameState.stage4Tasks.painting) { diyalogGoster("Resmimi panoya astık bile! 🎨"); return; }
+          gameState.stage4Tasks.painting = true;
+          playSound('clean'); titre(50);
+
+          const resimler = {
+            22: "Bak annecim! Okul bahçesinde uçan sarı-lacivert bir kelebek çizdim! 🎨🦋",
+            23: "Bugün ailemizi çizdim! Sen, babam, ben... Babamın elinde Fenerbahçe bayrağı var! 👨‍👩‍👧💛💙",
+            24: "Öğretmenimiz gökyüzünü çizin dedi, ben de bulutların üstüne kocaman parlayan bir güneş kondurdum! ☀️☁️",
+            25: "Okulun bahçesindeki kediyi çizdim! Adını 'Pamuk' koyduk arkadaşlarımla! 🐱🌸",
+            26: "Sana en sevdiğin pembe çiçeklerden kocaman bir buket çizdim annecim! 💐💖",
+            27: "Babamla stadyuma gittiğimizi hayal ettim, kaleye gol atan bir futbolcu çizdim! ⚽🏟️",
+            28: "Okuldaki tüm arkadaşlarımı el ele tutuşurken çizdim! Öğretmenim panonun en başına astı! 🏫🎈"
+          };
+
+          const bugununResmi = resimler[gameState.day] || "Bak annecim okulda çizdim! Çok güzel oldu değil mi? 🎨✨";
+          diyalogGoster(bugununResmi);
+        } else if (tur === 'bag') {
+          if (!gameState.stage4Tasks.chat) { diyalogGoster("Önce bugünü konuşalım annecim! 💬"); return; }
+          if (gameState.stage4Tasks.bag) { diyalogGoster("Çantam hazır, uyuyabilirim! 🎒💤"); return; }
+          gameState.stage4Tasks.bag = true;
+          playSound('lullaby'); titre(60);
+          diyalogGoster("Yarın okulda arkadaşlarımla oynayacağım... İyi uykular annecim! 🎒🌙💤");
+        }
+      }
+
+      kaydet();
+    }
+
+    // --- 5. GÜN BİTİRME & BÜYÜME GEÇİŞLERİ ---
+    function gunuTamamla() {
+      const endBtn = document.getElementById('end-day-btn');
+      if (!endBtn.classList.contains('ready')) {
+        diyalogGoster("Daha yapacaklarımız bitmedi annecim! ✨");
+        return;
+      }
+
+      const overlay = document.getElementById('transition-overlay');
+      const transTitle = document.getElementById('trans-title');
+      const transSub = document.getElementById('trans-sub');
+
+      transTitle.innerText = "Gün " + gameState.day + " Tamamlandı 💤";
+      transSub.innerText = gameState.name + " tatlı bir uykuya daldı...";
+      overlay.classList.add('active');
+      document.body.classList.add('night-mode');
+      playSound('lullaby');
+
+      setTimeout(() => {
+        gameState.day += 1;
+        gameState.stage1Tasks = { feed: false, diaper: false, burp: false, lullaby: false };
+        gameState.stage2Tasks = { prepMama: false, feedMama: false, diaper: false, rattle: false };
+        gameState.stage3Tasks = { breakfast: false, toys: false, run: false, book: false };
+        gameState.stage4Tasks = { lunchbox: false, painting: false, chat: false, bag: false };
+
+        let buyumeMetni = "";
+        if (gameState.day === 8 && gameState.stage === 1) {
+          gameState.stage = 2;
+          buyumeMetni = "Kızımız 7 günlük bebeklik dönemini tamamladı ve emekleme dönemine geçti! 🌸";
+        } else if (gameState.day === 15 && gameState.stage === 2) {
+          gameState.stage = 3;
+          buyumeMetni = "Kızımız artık büyüdü, ayağa kalktı ve ilk cümlelerini kurmaya başladı! 🎀";
+        } else if (gameState.day === 22 && gameState.stage === 3) {
+          gameState.stage = 4;
+          buyumeMetni = "Kızımız anasınıfına başladı! Artık sırtında sarı-lacivert çantasıyla okula gidiyor ve seninle sohbet edebiliyor! 🎒🌸";
+        }
+
+        kaydet();
+        applyStageVisuals();
+
+        transTitle.innerText = "Günaydın! ☀️";
+        transSub.innerText = "Gün " + gameState.day + " başladı. Güneş doğdu!";
+
+        setTimeout(() => {
+          overlay.classList.remove('active');
+          document.body.classList.remove('night-mode');
+
+          if (buyumeMetni !== "") {
+            document.getElementById('level-up-text').innerText = buyumeMetni;
+            document.getElementById('level-up-modal').style.display = 'flex';
+            playSound('rattle');
+          } else {
+            if (gameState.stage === 1) diyalogGoster("Aguuu... ☀️");
+            else if (gameState.stage === 2) diyalogGoster("An-neee! ☀️");
+            else diyalogGoster("Günaydın annecim! ☀️🌸");
+          }
+        }, 1800);
+
+      }, 2500);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    applyStageVisuals();
+    uiGuncelle();
+  </script>
+</body>
+</html>
